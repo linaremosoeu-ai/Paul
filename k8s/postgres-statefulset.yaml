@@ -1,0 +1,67 @@
+# PostgreSQL StatefulSet for Kubernetes
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: umbrella-postgres
+  namespace: umbrella
+spec:
+  serviceName: umbrella-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: umbrella-postgres
+  template:
+    metadata:
+      labels:
+        app: umbrella-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: umbrella
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: username
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: password
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+          limits:
+            cpu: 1000m
+            memory: 2Gi
+  volumeClaimTemplates:
+  - metadata:
+      name: postgres-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 50Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: umbrella-postgres
+  namespace: umbrella
+spec:
+  clusterIP: None
+  selector:
+    app: umbrella-postgres
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432

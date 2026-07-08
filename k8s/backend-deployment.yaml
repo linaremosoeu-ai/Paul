@@ -1,0 +1,62 @@
+# Kubernetes Deployment for Backend
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: umbrella-api
+  namespace: umbrella
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: umbrella-api
+  template:
+    metadata:
+      labels:
+        app: umbrella-api
+    spec:
+      containers:
+      - name: umbrella-api
+        image: umbrella/api:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: connection-string
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: umbrella-api-service
+  namespace: umbrella
+spec:
+  selector:
+    app: umbrella-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer

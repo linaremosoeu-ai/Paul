@@ -1,0 +1,27 @@
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: umbrella
+---
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: umbrella-config
+  namespace: umbrella
+data:
+  ASPNETCORE_ENVIRONMENT: "Production"
+  NEXT_PUBLIC_API_URL: "http://umbrella-api-service/api"
+---
+# Secret for database credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+  namespace: umbrella
+type: Opaque
+stringData:
+  username: postgres
+  password: postgres
+  connection-string: "Host=umbrella-postgres;Port=5432;Database=umbrella;Username=postgres;Password=postgres"
