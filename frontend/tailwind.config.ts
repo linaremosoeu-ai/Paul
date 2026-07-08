@@ -9,22 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          900: '#082f49',
-        },
-        slate: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          900: '#0f172a',
-        }
+        primary: '#3B82F6',
+        secondary: '#10B981',
+        danger: '#EF4444',
+        warning: '#F59E0B',
       },
       fontFamily: {
-        sans: ['var(--font-sans)'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
       },
     },
   },
